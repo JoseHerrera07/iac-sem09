@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+
+# Configuracion local del backend (contiene el nombre de tu bucket)
+backend.hcl
+
+# Editores
+.vscode/
+.idea/
