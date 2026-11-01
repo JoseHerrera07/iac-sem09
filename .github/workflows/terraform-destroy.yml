@@ -1,0 +1,57 @@
+name: Terraform Destroy dev
+
+run-name: ${{ github.actor }} esta destruyendo la infraestructura dev
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: "Escribe destroy para confirmar"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: false
+
+jobs:
+  Destruir-Infraestructura:
+    if: ${{ inputs.confirmar == 'destroy' }}
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v6
+
+      - name: Credenciales temporales de AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.13.0"
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: |
+          terraform init -input=false \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="key=lab09/dev/terraform.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION }}" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Terraform destroy
+        run: terraform destroy -input=false -auto-approve
