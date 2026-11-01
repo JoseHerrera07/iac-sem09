@@ -59,5 +59,7 @@ jobs:
       - name: Terraform apply
         run: terraform apply -input=false -auto-approve tfplan
 
-      - name: Mostrar resumen
-        run: echo "### Despliegue completado" >> "$GITHUB_STEP_SUMMARY"
+      - name: Mostrar URL del balanceador
+        run: |
+          echo "### Despliegue completado" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL de la API: http://$(terraform output -raw alb_dns_name)" >> "$GITHUB_STEP_SUMMARY"
