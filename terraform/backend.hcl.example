@@ -1,0 +1,5 @@
+bucket       = "cambiar-con-el-nombre-del-bucket-de-estado"
+key          = "lab09/dev/terraform.tfstate"
+region       = "us-east-2"
+encrypt      = true
+use_lockfile = true

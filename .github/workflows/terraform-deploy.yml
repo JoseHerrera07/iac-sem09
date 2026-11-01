@@ -1,0 +1,65 @@
+name: Terraform Deploy dev
+
+run-name: ${{ github.actor }} esta desplegando la infraestructura dev
+on:
+  push:
+    branches: [development]
+
+# Permisos minimos: leer el codigo y pedir el token OIDC
+permissions:
+  contents: read
+  id-token: write
+
+# Evita dos despliegues a la vez sobre el mismo estado
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: false
+
+jobs:
+  Desplegar-Infraestructura:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v6
+
+      - name: Credenciales temporales de AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.13.0"
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: |
+          terraform init -input=false \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="key=lab09/dev/terraform.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION }}" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply -input=false -auto-approve tfplan
+
+      - name: Mostrar URL del balanceador
+        run: |
+          echo "### Despliegue completado" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL de la API: http://$(terraform output -raw alb_dns_name)" >> "$GITHUB_STEP_SUMMARY"

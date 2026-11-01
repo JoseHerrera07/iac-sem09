@@ -1,0 +1,35 @@
+name: Terraform Validar
+
+run-name: ${{ github.actor }} abrio un pull request - validando Terraform
+on:
+  pull_request:
+    branches: [development, main]
+
+# Validacion sin credenciales AWS: este workflow NO asume el rol de despliegue
+permissions:
+  contents: read
+
+jobs:
+  Validar-Terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v6
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.13.0"
+          terraform_wrapper: false
+
+      - name: Revisar formato (terraform fmt)
+        run: terraform fmt -check -recursive
+
+      - name: Inicializar sin backend
+        run: terraform init -backend=false -input=false
+
+      - name: Validar sintaxis (terraform validate)
+        run: terraform validate
