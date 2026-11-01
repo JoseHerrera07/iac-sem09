@@ -56,3 +56,13 @@ module "database" {
   instance_class    = var.db_instance_class
   multi_az          = var.db_multi_az
 }
+
+module "cache" {
+  source = "./modules/cache"
+
+  name_prefix       = local.name_prefix
+  data_subnet_ids   = module.network.data_subnet_ids
+  security_group_id = module.security.cache_security_group_id
+  node_type         = var.cache_node_type
+  num_nodes         = var.cache_num_nodes
+}

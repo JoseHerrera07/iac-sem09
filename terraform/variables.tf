@@ -75,3 +75,15 @@ variable "db_multi_az" {
   type        = bool
   default     = false
 }
+
+variable "cache_node_type" {
+  description = "Tipo de nodo de ElastiCache Redis."
+  type        = string
+  default     = "cache.t3.micro"
+}
+
+variable "cache_num_nodes" {
+  description = "Nodos de Redis (1 = solo primario, 2 = primario + replica con failover)."
+  type        = number
+  default     = 1
+}

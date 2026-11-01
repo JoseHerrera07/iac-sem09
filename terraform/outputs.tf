@@ -22,3 +22,8 @@ output "db_secret_arn" {
   description = "ARN del secreto de Secrets Manager con la contrasena de la BD."
   value       = module.database.master_user_secret_arn
 }
+
+output "redis_endpoint" {
+  description = "Endpoint primario de ElastiCache Redis."
+  value       = module.cache.primary_endpoint
+}
