@@ -17,3 +17,19 @@ module "network" {
   app_subnet_cidrs    = var.app_subnet_cidrs
   data_subnet_cidrs   = var.data_subnet_cidrs
 }
+
+module "security" {
+  source = "./modules/security"
+
+  name_prefix = local.name_prefix
+  vpc_id      = module.network.vpc_id
+}
+
+module "alb" {
+  source = "./modules/alb"
+
+  name_prefix       = local.name_prefix
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
+  security_group_id = module.security.alb_security_group_id
+}
