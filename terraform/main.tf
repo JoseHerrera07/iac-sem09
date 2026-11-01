@@ -46,3 +46,13 @@ module "compute" {
   max_size          = var.asg_max_size
   desired_capacity  = var.asg_desired_capacity
 }
+
+module "database" {
+  source = "./modules/database"
+
+  name_prefix       = local.name_prefix
+  data_subnet_ids   = module.network.data_subnet_ids
+  security_group_id = module.security.db_security_group_id
+  instance_class    = var.db_instance_class
+  multi_az          = var.db_multi_az
+}

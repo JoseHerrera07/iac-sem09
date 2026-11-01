@@ -63,3 +63,15 @@ variable "asg_desired_capacity" {
   type        = number
   default     = 2
 }
+
+variable "db_instance_class" {
+  description = "Clase de instancia de RDS."
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_multi_az" {
+  description = "Activa Multi-AZ en RDS (false en dev para ahorrar costo)."
+  type        = bool
+  default     = false
+}
