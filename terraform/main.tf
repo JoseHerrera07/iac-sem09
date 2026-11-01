@@ -33,3 +33,16 @@ module "alb" {
   public_subnet_ids = module.network.public_subnet_ids
   security_group_id = module.security.alb_security_group_id
 }
+
+module "compute" {
+  source = "./modules/compute"
+
+  name_prefix       = local.name_prefix
+  app_subnet_ids    = module.network.app_subnet_ids
+  security_group_id = module.security.app_security_group_id
+  target_group_arn  = module.alb.target_group_arn
+  instance_type     = var.instance_type
+  min_size          = var.asg_min_size
+  max_size          = var.asg_max_size
+  desired_capacity  = var.asg_desired_capacity
+}

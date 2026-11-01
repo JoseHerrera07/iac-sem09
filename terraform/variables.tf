@@ -39,3 +39,27 @@ variable "data_subnet_cidrs" {
   type        = list(string)
   default     = ["10.0.21.0/24", "10.0.22.0/24"]
 }
+
+variable "instance_type" {
+  description = "Tipo de instancia EC2 de la API."
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "asg_min_size" {
+  description = "Minimo de instancias del Auto Scaling Group."
+  type        = number
+  default     = 2
+}
+
+variable "asg_max_size" {
+  description = "Maximo de instancias del Auto Scaling Group."
+  type        = number
+  default     = 6
+}
+
+variable "asg_desired_capacity" {
+  description = "Instancias deseadas al crear el Auto Scaling Group."
+  type        = number
+  default     = 2
+}
